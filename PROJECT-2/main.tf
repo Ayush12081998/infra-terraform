@@ -1,7 +1,7 @@
 provider "aws" {
   region = "ap-south-1"
-  access_key = "**************"
-  secret_key = "**************"
+  access_key = "*****"
+  secret_key = "*****"
 }
 
 resource "aws_vpc" "proj-vpc" {
@@ -9,6 +9,11 @@ resource "aws_vpc" "proj-vpc" {
   tags = {
     Name="dev"
   }
+}
+
+# print output on console when resource is created
+output "vpc_cidr_block" {
+  value = aws_vpc.proj-vpc.arn
 }
 
 resource "aws_internet_gateway" "proj-internet-gw" {
@@ -107,20 +112,26 @@ resource "aws_eip" "proj-eip" {
   depends_on = [ aws_internet_gateway.proj-internet-gw ]
 }
 
+variable "var_az" {
+  description = "availability zone"
+  # default="ap-south-1a"
+  type = string
+}
+
 resource "aws_instance" "web-server-instance" {
   ami           = "ami-02d26659fd82cf299"
   instance_type = "t3.micro"
-  availability_zone = "ap-south-1a"
+  availability_zone = var.var_az
   key_name = "main-key"
   network_interface {
     device_index = 0
     network_interface_id = aws_network_interface.proj-nic.id
   }
   
-  user_data = <<-EOF
+  user_data = <<EOF
               #!/bin/bash
               sudo apt update -y
-              sudo apt install apache2
+              sudo apt install -y apache2
               sudo bash -c 'echo your server > /var/www/html/index.html'
               EOF
 tags = {

@@ -3,6 +3,13 @@ terraform plan
 terraform apply
 terraform destroy
 
+terraform state list
+terraform state show aws_vpc.proj-vpc
+terraform destroy -target aws_instance.web-server-instance
+terraform apply -target aws_instance.web-server-instance
+
+#setting variable in cli args
+terraform  apply -var "var_az=ap-south-1a"
 
 ###################
 https://www.youtube.com/watch?v=SLB_c_ayRMo
